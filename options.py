@@ -21,8 +21,8 @@ def get_options(args=None):
     parser.add_argument('--out_channels', type=int, default=32)
 
     # Training
-    parser.add_argument('--learning_rate', type=float, default=0.01)
-    parser.add_argument('--epochs', type=float, default=250)
+    parser.add_argument('--learning_rate', type=float, default=0.001)
+    parser.add_argument('--epochs', type=float, default=300)
     parser.add_argument('--eval_only', action='store_true', help='Set this value to only evaluate model')
     parser.add_argument('--n_epochs', type=int, default=100, help='The number of epochs to train')
     parser.add_argument('--seed', type=int, default=1234, help='Random seed to use')

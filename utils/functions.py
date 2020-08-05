@@ -10,13 +10,13 @@ def load_data_class(name):
     return dataset
 
 def load_model(name):
-    from models.supervised.nets import PredictorGraphConv, PredictorGCN, PredictorSAGEConv, PredictorExpGraphConv\
-        ,PredictorMLP
-    model = {'PredictorGraphConv': PredictorGraphConv,
-          'PredictorGCN': PredictorGCN,
-          'PredictorSAGEConv': PredictorSAGEConv ,
-          'PredictorExpGraphConv': PredictorExpGraphConv,
-          'PredictorMLP': PredictorMLP
+    from models.supervised.nets import FAE_GraphConv, FAE_GCN, FAE_SAGEConv, FAE_ExpGraphConv\
+        ,AE_MLP
+    model = {'GraphConv': FAE_GraphConv,
+          'GCN': FAE_GCN,
+          'SAGEConv': FAE_SAGEConv ,
+          'ExpGraphConv': FAE_ExpGraphConv,
+          'MLP': AE_MLP
     }.get(name, None)
     assert model is not None, "Currently unsupported model: {}!".format(name)
     return model

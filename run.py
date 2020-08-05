@@ -50,8 +50,8 @@ def run(opts):
 
     if opts.problem == 'Prediction':
         prediction_eval(model_class, data, opts)
-    elif opts.problem == 'Imputation':
-        imputation_train(model_class, data, opts)
+    # elif opts.problem == 'Imputation':
+    #     imputation_train(model_class, data, opts)
 
 if __name__ == "__main__":
     run(get_options())
