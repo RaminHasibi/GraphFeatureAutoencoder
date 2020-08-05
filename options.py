@@ -54,6 +54,4 @@ def get_options(args=None):
         "{}_{}_{}".format(opts.problem, opts.model, opts.dataset),
         opts.run_name
     )
-    assert (opts.bl_warmup_epochs == 0) or (opts.baseline == 'rollout')
-    assert opts.epoch_size % opts.batch_size == 0, "Epoch size must be integer multiple of batch size!"
     return opts
