@@ -29,6 +29,10 @@ def get_options(args=None):
     parser.add_argument('--max_grad_norm', type=float, default=1.0,
                         help='Maximum L2 norm for gradient clipping, default 1.0 (0 to disable clipping)')
     parser.add_argument('--no_cuda', action='store_true', help='Disable CUDA')
+    parser.add_argument('--features', action='store_true',
+                        help='Whether to use Expression values as node features or not')
+    parser.add_argument('--scale', action='store_true',
+                        help='Whether to scale Expression values or not')
 
 
     # Misc
