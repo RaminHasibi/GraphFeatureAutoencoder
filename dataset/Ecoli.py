@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import os.path as osp
 
+
 class Ecoli_Exp(InMemoryDataset):
     def __init__(self, root, network='TF_net', Normalize=False, transform=None, pre_transform=None):
         self.network = network
@@ -26,10 +27,6 @@ class Ecoli_Exp(InMemoryDataset):
     def download(self):
         pass
 
-    def index_to_mask(self, index, size):
-        mask = torch.zeros((size,), dtype=torch.bool)
-        mask[index] = 1
-        return mask
 
     def read_TF_net(self, root):
         TF_gene = pd.read_csv(root + "/network_tf_gene.txt", skiprows=34, header=None, usecols=[0, 1, 2, 4],
@@ -143,17 +140,18 @@ class Ecoli_Exp(InMemoryDataset):
         elif self.network == 'Genetic':
             edge_index, x = self.read_Genetic(self.root)
         indeces = np.arange(len(x))
-        train_indeces, test_indeces = train_test_split(indeces, test_size=.33, random_state=42)
-        # train_indeces,valid_indeces = train_test_split(train_valid_indeces,test_size=.15,random_state=42)
-
-        train_feats_indeces, test_feats_indeces = train_test_split(np.arange(x.size(1)), test_size=.33, random_state=42)
-        y = x[:, test_feats_indeces]
-        x = x[:, train_feats_indeces]
+        # train_indeces, test_indeces = train_test_split(indeces, test_size=.33, random_state=42)
+        # # train_indeces,valid_indeces = train_test_split(train_valid_indeces,test_size=.15,random_state=42)
+        #
+        # train_feats_indeces, test_feats_indeces = train_test_split(np.arange(x.size(1)), test_size=.33, random_state=42)
+        # y = x[:, test_feats_indeces]
+        # x = x[:, train_feats_indeces]
+        y = x
         edge_index = to_undirected(edge_index)
         edge_index = remove_self_loops(edge_index)[0]
-        train_mask = self.index_to_mask(train_indeces, x.size(0))
-        # val_mask = self.index_to_mask(valid_indeces, x.size(0))
-        test_mask = self.index_to_mask(test_indeces, x.size(0))
+        # train_mask = self.index_to_mask(train_indeces, x.size(0))
+        # # val_mask = self.index_to_mask(valid_indeces, x.size(0))
+        # test_mask = self.index_to_mask(test_indeces, x.size(0))
 
         #         if self.normalize:
         #             scaler = StandardScaler()
@@ -164,3 +162,5 @@ class Ecoli_Exp(InMemoryDataset):
         # data.val_mask = val_mask
         data.test_mask = test_mask
         torch.save(self.collate([data]), self.processed_paths[0])
+
+

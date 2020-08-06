@@ -1,4 +1,4 @@
-
+import torch
 
 def load_data_class(name):
     from dataset import Ecoli_Exp,RnaSeq
@@ -20,3 +20,9 @@ def load_model(name):
     }.get(name, None)
     assert model is not None, "Currently unsupported model: {}!".format(name)
     return model
+
+
+def index_to_mask(index, size):
+    mask = torch.zeros((size,), dtype=torch.bool)
+    mask[index] = 1
+    return mask
