@@ -11,12 +11,8 @@ class Ecoli_Exp(InMemoryDataset):
         self.network = network
         self.normalize = Normalize
         super(InMemoryDataset, self).__init__(root, transform, pre_transform)
-        if network == 'TF_net':
-            self.data, self.slices = torch.load(self.processed_paths[0])
-        elif network == 'PPI':
-            self.data, self.slices = torch.load(self.processed_paths[1])
-        elif network == 'Genetic':
-            self.data, self.slices = torch.load(self.processed_paths[2])
+        self.data, self.slices = torch.load(self.processed_paths[0])
+
 
     @property
     def raw_file_names(self):
@@ -25,7 +21,7 @@ class Ecoli_Exp(InMemoryDataset):
 
     @property
     def processed_file_names(self):
-        return ['processed_TF_data.pt', 'processed_PPI_data.pt', 'processed_Genetic_data.pt']
+        return ['processed_{}_data.pt'.format(self.network)]
 
     def download(self):
         pass
@@ -138,6 +134,7 @@ class Ecoli_Exp(InMemoryDataset):
 
         return dense_to_sparse(torch.tensor(Adj))[0], torch.tensor(features, dtype=torch.float32)
 
+
     def process(self):
         if self.network == 'TF_net':
             edge_index, x = self.read_TF_net(self.root)
@@ -166,9 +163,4 @@ class Ecoli_Exp(InMemoryDataset):
         data.train_mask = train_mask
         # data.val_mask = val_mask
         data.test_mask = test_mask
-        if self.network == 'TF_net':
-            torch.save(self.collate([data]), self.processed_paths[0])
-        elif self.network == 'PPI':
-            torch.save(self.collate([data]), self.processed_paths[1])
-        elif self.network == 'Genetic':
-            torch.save(self.collate([data]), self.processed_paths[2])
+        torch.save(self.collate([data]), self.processed_paths[0])
