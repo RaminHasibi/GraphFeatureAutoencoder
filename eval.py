@@ -22,8 +22,8 @@ def prediction_eval(model_class, data, opts):
             y_pred.append(model(data))
         del model
         del optimizer
-        mse = []
-        for i in range(data.y.size(1)):
-            mse.append(scimse(y_pred[i][data.test_mask.cpu().data.numpy()].cpu().data.numpy(),
-                              data.y[data.test_mask, i].cpu().data.numpy().reshape([-1, 1])))
-        print('Average+-std Error for test expression values: {:.5f}+-{:.5f}'.format(np.mean(mse), np.std(mse)))
+    mse = []
+    for i in range(data.y.size(1)):
+        mse.append(scimse(y_pred[i][data.test_mask.cpu().data.numpy()].cpu().data.numpy(),
+                          data.y[data.test_mask, i].cpu().data.numpy().reshape([-1, 1])))
+    print('Average+-std Error for test expression values: {:.5f}+-{:.5f}'.format(np.mean(mse), np.std(mse)))

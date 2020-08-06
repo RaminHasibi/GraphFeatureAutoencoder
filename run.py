@@ -32,19 +32,15 @@ def run(opts):
     # Choose the dataset to use
     data_class = load_data_class(opts.dataset)
 
-
-
-
-
     # Load data from load_path
     data = data_class(root=opts.datadir, network=opts.network)[0]
 
     # Preprocess node features
     if not opts.features:
         data.x = torch.eye(data.num_nodes)
-    elif opts.scale:
-        scaler = StandardScaler().fit(data.x)
-        data.x = torch.tensor(scaler.transform(data.x), dtype=torch.float32)
+    # elif opts.scale:
+    #     scaler = StandardScaler().fit(data.x)
+    #     data.x = torch.tensor(scaler.transform(data.x), dtype=torch.float32)
 
     model_class = load_model(opts.model)
 

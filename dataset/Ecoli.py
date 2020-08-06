@@ -4,7 +4,7 @@ import torch
 import numpy as np
 from sklearn.model_selection import train_test_split
 import pandas as pd
-
+import os.path as osp
 
 class Ecoli_Exp(InMemoryDataset):
     def __init__(self, root, network='TF_net', Normalize=False, transform=None, pre_transform=None):
@@ -21,6 +21,7 @@ class Ecoli_Exp(InMemoryDataset):
     @property
     def raw_file_names(self):
         return []
+
 
     @property
     def processed_file_names(self):
