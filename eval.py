@@ -30,8 +30,8 @@ def prediction_eval(model_class, data, opts):
             model = model_class(eval_data.num_features, opts.out_channels, opts.hidden).to(opts.device)
             optimizer = torch.optim.Adam(model.parameters(), lr=opts.learning_rate)
             for epoch in range(1, opts.epochs + 1):
-                loss_train = train_epoch(model, eval_data, optimizer, exp_num, criterion)
-            loss_test = test(model, eval_data, exp_num, criterion)
+                loss_train = train_epoch(model, eval_data, optimizer, exp_num, criterion ,opts)
+            loss_test = test(model, eval_data, exp_num, criterion, opts)
             model.eval()
             print('Exp: {:03d}, Loss: {:.5f}, TestLoss: {:.5f}'.
                   format(exp_num, loss_train, loss_test))
@@ -44,3 +44,6 @@ def prediction_eval(model_class, data, opts):
                               eval_data.y[eval_data.test_mask, i].cpu().eval_data.numpy().reshape([-1, 1])))
     print('Average+-std Error for test expression values: {:.5f}+-{:.5f}'.format(np.mean(mse), np.std(mse)))
     return mse
+
+
+def imputation_eval(model_class, data, opts):

@@ -38,16 +38,15 @@ def run(opts):
     # Preprocess node features
     if not opts.features:
         data.x = torch.eye(data.num_nodes)
-    # elif opts.scale:
-    #     scaler = StandardScaler().fit(data.x)
-    #     data.x = torch.tensor(scaler.transform(data.x), dtype=torch.float32)
+
 
     model_class = load_model(opts.model)
 
+    assert opts.problem in ['Prediction', 'Imputation'], 'only support prediction or imputation of expression values'
     if opts.problem == 'Prediction':
         prediction_eval(model_class, data, opts)
-    # elif opts.problem == 'Imputation':
-    #     imputation_train(model_class, data, opts)
+    elif opts.problem == 'Imputation':
+        imputation_eval(model_class, data, opts)
 
 if __name__ == "__main__":
     run(get_options())

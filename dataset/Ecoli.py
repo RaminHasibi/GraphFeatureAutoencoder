@@ -8,9 +8,10 @@ import os.path as osp
 
 
 class Ecoli_Exp(InMemoryDataset):
-    def __init__(self, root, network='TF_net', Normalize=False, transform=None, pre_transform=None):
+    def __init__(self, root, network='TF_net', imputation=False, Normalize=False, transform=None, pre_transform=None):
         self.network = network
         self.normalize = Normalize
+        self.imputation = imputation
         super(InMemoryDataset, self).__init__(root, transform, pre_transform)
         self.data, self.slices = torch.load(self.processed_paths[0])
 
@@ -22,7 +23,8 @@ class Ecoli_Exp(InMemoryDataset):
 
     @property
     def processed_file_names(self):
-        return ['processed_{}_data.pt'.format(self.network)]
+        return ['processed_{}_imputation_data.pt'.format(self.network) if self.imputation
+                else 'processed_{}_data'.format(self.network)]
 
     def download(self):
         pass
@@ -139,28 +141,15 @@ class Ecoli_Exp(InMemoryDataset):
             edge_index, x = self.read_PPI(self.root)
         elif self.network == 'Genetic':
             edge_index, x = self.read_Genetic(self.root)
-        indeces = np.arange(len(x))
-        # train_indeces, test_indeces = train_test_split(indeces, test_size=.33, random_state=42)
-        # # train_indeces,valid_indeces = train_test_split(train_valid_indeces,test_size=.15,random_state=42)
-        #
-        # train_feats_indeces, test_feats_indeces = train_test_split(np.arange(x.size(1)), test_size=.33, random_state=42)
-        # y = x[:, test_feats_indeces]
-        # x = x[:, train_feats_indeces]
+        assert self.network in ['TF_net', 'PPI', 'Genetic'], 'currently supported graphs are Transcription factors,' \
+                                                             ' Protein-Protein Interaction, and Genetics for E-Coli'
         y = x
         edge_index = to_undirected(edge_index)
         edge_index = remove_self_loops(edge_index)[0]
-        # train_mask = self.index_to_mask(train_indeces, x.size(0))
-        # # val_mask = self.index_to_mask(valid_indeces, x.size(0))
-        # test_mask = self.index_to_mask(test_indeces, x.size(0))
-
-        #         if self.normalize:
-        #             scaler = StandardScaler()
-        #             scaler.fit(x)
-        #             scaler.tra
         data = Data(x=x, edge_index=edge_index, y=y)
-        data.train_mask = train_mask
-        # data.val_mask = val_mask
-        data.test_mask = test_mask
+        if self.imputation:
+            data.indices = np.indices([x.size(0), x.size(1)]).reshape(2, -1)
+
         torch.save(self.collate([data]), self.processed_paths[0])
 
 

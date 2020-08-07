@@ -23,6 +23,7 @@ def load_model(name):
 
 
 def index_to_mask(index, size):
+    # if len(size) == 2
     mask = torch.zeros((size,), dtype=torch.bool)
     mask[index] = 1
     return mask
