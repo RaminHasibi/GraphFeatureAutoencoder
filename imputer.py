@@ -6,4 +6,7 @@ def impute(model_class, data, opts):
     optimizer = torch.optim.Adam(model.parameters(), lr=opts.learning_rate)
     for epoch in range(1, opts.epochs + 1):
         loss_train = train_epoch(model, data, optimizer, None, criterion, opts)
+        if epoch%10 == 0:
+            print('Exp: {:03d}, Loss: {:.5f}'.
+                  format(epoch, loss_train))
     return model(data)
