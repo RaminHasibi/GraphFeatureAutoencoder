@@ -8,11 +8,11 @@ def get_options(args=None):
         description="Attention based model for solving the Travelling Salesman Problem with Reinforcement Learning")
 
     # Data
-    parser.add_argument('--problem', default='Prediction', help="Want to predict or Impute the dataset")
-    parser.add_argument('--network', type=str, default='TF_net')
+    parser.add_argument('--problem', default='Imputation', help="Want to predict or Impute the dataset")
+    parser.add_argument('--network', type=str, default='MousePPI')
 
-    parser.add_argument('--dataset', type=str, default='Ecoli')
-    parser.add_argument('--datadir', type=str, default='data/Ecoli')
+    parser.add_argument('--dataset', type=str, default='RNA')
+    parser.add_argument('--datadir', type=str, default='data/RNASeq')
 
     # Model
 

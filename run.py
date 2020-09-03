@@ -10,7 +10,8 @@ from sklearn.preprocessing import StandardScaler
 from options import get_options
 
 from utils.functions import load_data_class, load_model
-from eval import prediction_eval
+from eval import prediction_eval, imputation_eval
+from imputer import impute
 
 
 def run(opts):
@@ -41,12 +42,15 @@ def run(opts):
 
 
     model_class = load_model(opts.model)
-
     assert opts.problem in ['Prediction', 'Imputation'], 'only support prediction or imputation of expression values'
+
     if opts.problem == 'Prediction':
         prediction_eval(model_class, data, opts)
-    elif opts.problem == 'Imputation':
+    elif opts.problem == 'Imputation_eval':
         imputation_eval(model_class, data, opts)
+    elif opts.problem == 'Imputation':
+        impute(model_class, data, opts)
+
 
 if __name__ == "__main__":
     run(get_options())
