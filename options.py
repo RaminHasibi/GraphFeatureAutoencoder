@@ -16,7 +16,7 @@ def get_options(args=None):
 
     # Model
 
-    parser.add_argument('--model', type=str, default='ExpGraphConv')
+    parser.add_argument('--model', type=str, default='MLP')
     parser.add_argument('--hidden', type=int, default=16)
     parser.add_argument('--out_channels', type=int, default=32)
 
