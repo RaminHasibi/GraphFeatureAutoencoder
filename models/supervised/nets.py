@@ -41,7 +41,7 @@ class FAE_SAGEConv(nn.Module):
             self.conv2 = SAGEConv(64, 32, concat= True)
             self.lin = Lin(32, 1)
         else:
-            self.conv1 = GCNConv(in_channels, 64)
+            self.conv1 = SAGEConv(in_channels, 64)
             self.lin = Lin(64, in_channels)
     def forward(self, data):
         if self.opts.problem == 'Prediction':
@@ -122,8 +122,8 @@ class AE_MLP(nn.Module):
             self.lin2 = Lin(64, 32)
             self.lin3 = Lin(32, 1)
         else:
-            self.lin1 = Lin(in_channels, 64)
-            self.lin2 = Lin(64, in_channels)
+            self.lin1 = Lin(in_channels, 2000)
+            self.lin2 = Lin(2000, in_channels)
 
     def forward(self, data):
         if self.opts.problem == 'Prediction':
@@ -133,6 +133,6 @@ class AE_MLP(nn.Module):
             return self.lin3(x)
         else:
             x = data.x
-            x = torch.relu(self.lin1(x))
+            x = torch.sigmoid(self.lin1(x))
             x = self.lin2(x)
             return x
