@@ -6,6 +6,7 @@ import pprint as pp
 
 import torch
 from sklearn.preprocessing import StandardScaler
+import numpy as np
 
 from options import get_options
 
@@ -42,14 +43,15 @@ def run(opts):
 
 
     model_class = load_model(opts.model)
-    assert opts.problem in ['Prediction', 'Imputation'], 'only support prediction or imputation of expression values'
+    assert opts.problem in ['Prediction', 'Imputation', 'Imputation_eval'], 'only support prediction or imputation of expression values'
 
     if opts.problem == 'Prediction':
         prediction_eval(model_class, data, opts)
     elif opts.problem == 'Imputation_eval':
         imputation_eval(model_class, data, opts)
     elif opts.problem == 'Imputation':
-        impute(model_class, data, opts)
+        imputed = impute(model_class, data, opts)
+        np.save(opts.model + opts.network + '_imputed.npy', imputed.cpu().detach().numpy())
 
 
 if __name__ == "__main__":
