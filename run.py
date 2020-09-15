@@ -35,7 +35,7 @@ def run(opts):
     data_class = load_data_class(opts.dataset)
 
     # Load data from load_path
-    data = data_class(root=opts.datadir, network=opts.network)[0]
+    data = data_class(root=opts.datadir, network=opts.network)[0].to(opts.device)
 
     # Preprocess node features
     if not opts.features:
