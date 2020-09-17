@@ -5,7 +5,6 @@ import pprint as pp
 
 
 import torch
-from sklearn.preprocessing import StandardScaler
 import numpy as np
 
 from options import get_options
@@ -13,6 +12,7 @@ from options import get_options
 from utils.functions import load_data_class, load_model
 from eval import prediction_eval, imputation_eval
 from imputer import impute
+from sklearn.preprocessing import normalize
 
 
 def run(opts):
@@ -36,10 +36,10 @@ def run(opts):
 
     # Load data from load_path
     data = data_class(root=opts.datadir, network=opts.network)[0].to(opts.device)
-    print(opts.no_scale)
-    if not opts.no_features and not opts.no_scale:
-        print('data scaled')
-        data.y = data.x = StandardScaler().fit_transform(data.x)
+    print(opts.norm)
+    if not opts.no_features and opts.norm:
+        print('data normalized')
+        data.y = data.x = normalize(data.x, norm='l1')
         
     
     # Preprocess node features

@@ -27,10 +27,10 @@ def get_options(args=None):
     parser.add_argument('--eval_only', action='store_true', help='Set this value to only evaluate model')
     parser.add_argument('--seed', type=int, default=12345, help='Random seed to use')
     parser.add_argument('--no_cuda', action='store_true', help='Disable CUDA')
-    parser.add_argument('--no_features', action='store_false',
+    parser.add_argument('--no_features', action='store_true',
                         help='Whether to use Expression values as node features or not')
-    parser.add_argument('--no_scale', action='store_true',
-                        help='Whether to scale Expression values or not')
+    parser.add_argument('--norm', action='store_false',
+                        help='Whether to normalize Expression values or not')
     # Misc
     parser.add_argument('--log_step', type=int, default=50, help='Log info every log_step steps')
     parser.add_argument('--log_dir', default='logs', help='Directory to write TensorBoard information to')
