@@ -11,8 +11,8 @@ def prediction_eval(model_class, data, opts):
 
     loss_train = []
     criterion = torch.nn.MSELoss()
-    kf = KFold(n_splits=3)
-    kf_feats = KFold(n_splits=3)
+    kf = KFold(n_splits=3, random_state=opts.seed)
+    kf_feats = KFold(n_splits=3, random_state=opts.seed)
 
     mse = []
 
@@ -27,22 +27,25 @@ def prediction_eval(model_class, data, opts):
         eval_data.train_mask = index_to_mask(train_index, eval_data.x.size(0))
         eval_data.test_mask = index_to_mask(test_index, eval_data.x.size(0))
         for exp_num in range(eval_data.y.size(1)):
+            torch.manual_seed(opts.seed)
+            if torch.cuda.is_available():
+                torch.cuda.manual_seed_all(opts.seed)
             model = model_class(eval_data.num_features, opts).to(opts.device)
             optimizer = torch.optim.Adam(model.parameters(), lr=opts.learning_rate)
             for epoch in range(1, opts.epochs + 1):
                 loss_train = train_epoch(model, eval_data, optimizer, exp_num, criterion ,opts)
             loss_test = test(model, eval_data, exp_num, criterion, opts)
             model.eval()
-            print('Exp: {:03d}, Loss: {:.5f}, TestLoss: {:.5f}'.
+            print('Exp: {:03d}, Loss: {:.10f}, TestLoss: {:.10f}'.
                   format(exp_num, loss_train, loss_test))
             with torch.no_grad():
                 y_pred.append(model(eval_data))
-            del model
-            del optimizer
+#             del model
+#             del optimizer
         for i in range(eval_data.y.size(1)):
-            mse.append(scimse(y_pred[i][eval_data.test_mask.cpu().eval_data.numpy()].cpu().eval_data.numpy(),
-                              eval_data.y[eval_data.test_mask, i].cpu().eval_data.numpy().reshape([-1, 1])))
-    print('Average+-std Error for test expression values: {:.5f}+-{:.5f}'.format(np.mean(mse), np.std(mse)))
+            mse.append(scimse(y_pred[i][eval_data.test_mask.cpu().numpy()].cpu().numpy(),
+                              eval_data.y[eval_data.test_mask, i].cpu().numpy().reshape([-1, 1])))
+    print('Average+-std Error for test expression values: {:.10f}+-{:.10f}'.format(np.mean(mse), np.std(mse)))
     return mse
 
 

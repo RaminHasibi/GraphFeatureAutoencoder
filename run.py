@@ -35,19 +35,20 @@ def run(opts):
     data_class = load_data_class(opts.dataset)
 
     # Load data from load_path
-    data = data_class(root=opts.datadir, network=opts.network)[0].to(opts.device)
+    data = data_class(root=opts.datadir, network=opts.network)[0]
     print(opts.norm)
-    if not opts.no_features and opts.norm:
-        print('data normalized')
-        data.y = data.x = normalize(data.x, norm='l1')
+#     if not opts.no_features and opts.norm:
+#         print('data normalized')
+#         data.y = data.x = torch.tensor(normalize(data.x, norm='l1'), dtype=torch.float32)
+#         print(data)
         
     
     # Preprocess node features
-    if not opts.no_features:
+    if opts.no_features:
         print('node ids used')
         data.x = torch.eye(data.num_nodes)
 
-
+    data = data.to(opts.device)
     model_class = load_model(opts.model)
     assert opts.problem in ['Prediction', 'Imputation', 'Imputation_eval'], 'only support prediction or imputation of expression values'
 

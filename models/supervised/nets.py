@@ -12,8 +12,8 @@ class FAE_ExpGraphConv(nn.Module):
         super(FAE_ExpGraphConv, self).__init__()
         self.opts = opts
         if self.opts.problem == 'Prediction':
-            self.conv1 = ExpGraphConv(in_channels, 32, 64, aggr='mean')
-            self.conv2 = ExpGraphConv(64, 16, 32, aggr='mean')
+            self.conv1 = ExpGraphConv(in_channels, 64, 64, aggr='mean')
+            self.conv2 = ExpGraphConv(64, 32, 32, aggr='mean')
             self.lin = Lin(32, 1)
         else:
             self.conv1 = ExpGraphConv(in_channels, 64, 256, aggr='mean')
@@ -37,8 +37,8 @@ class FAE_SAGEConv(nn.Module):
         super(FAE_SAGEConv, self).__init__()
         self.opts = opts
         if self.opts.problem == 'Prediction':
-            self.conv1 = SAGEConv(in_channels, 64, concat =True)
-            self.conv2 = SAGEConv(64, 32, concat= True)
+            self.conv1 = SAGEConv(in_channels, 64)
+            self.conv2 = SAGEConv(64, 32)
             self.lin = Lin(32, 1)
         else:
             self.conv1 = SAGEConv(in_channels, 64)
@@ -90,7 +90,7 @@ class FAE_GraphConv(nn.Module):
         super(FAE_GraphConv, self).__init__()
         self.opts = opts
         if self.opts.problem == 'Prediction':
-            self.conv1 = GraphConv(in_channels, 64,aggr='mean')
+            self.conv1 = GraphConv(in_channels, 64, aggr='mean')
             self.conv2 = GraphConv(64, 32, aggr='mean')
             self.lin = Lin(32, 1)
         else:
