@@ -14,7 +14,6 @@ class ExpGraphConv(GraphConv):
         return self.propagate(edge_index, size=size, x=x, h=h,
                               edge_weight=edge_weight)
 
-
     def message(self, h_j, edge_weight):
         return h_j if edge_weight is None else edge_weight.view(-1, 1) * h_j
 

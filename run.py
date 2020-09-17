@@ -22,7 +22,7 @@ def run(opts):
 
     # Set the random seed
     torch.manual_seed(opts.seed)
-
+    
     os.makedirs(opts.save_dir)
     # Save arguments so exact configuration can always be found
     with open(os.path.join(opts.save_dir, "args.json"), 'w') as f:
@@ -36,9 +36,15 @@ def run(opts):
 
     # Load data from load_path
     data = data_class(root=opts.datadir, network=opts.network)[0].to(opts.device)
-
+    print(opts.no_scale)
+    if not opts.no_features and not opts.no_scale:
+        print('data scaled')
+        data.y = data.x = StandardScaler().fit_transform(data.x)
+        
+    
     # Preprocess node features
-    if not opts.features:
+    if not opts.no_features:
+        print('node ids used')
         data.x = torch.eye(data.num_nodes)
 
 
@@ -52,6 +58,7 @@ def run(opts):
     elif opts.problem == 'Imputation':
         imputed = impute(model_class, data, opts)
         np.save(opts.model + opts.network + '_imputed.npy', imputed.cpu().detach().numpy())
+    
 
 
 if __name__ == "__main__":

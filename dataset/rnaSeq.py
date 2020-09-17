@@ -37,7 +37,7 @@ class RnaSeq(InMemoryDataset):
 
     def process(self):
         edge_index = torch.tensor(np.array(
-            np.load(self.root + '/' + self.network + '.npy', allow_pickle=True), dtype=np.int)).t()
+            np.load(self.root + '/' + self.network + '.npy', allow_pickle=True), dtype=np.int))
         gene_names = None
         if self.network == 'MousePPI':
             x = torch.tensor(np.load(self.root + '/' + 'mouse_rnaSeq.npy', allow_pickle=True), dtype=torch.float)
