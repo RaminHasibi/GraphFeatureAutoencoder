@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch
 from torch.nn import Linear as Lin
 
-from models.supervised.layers import ExpGraphConv
+from models.End_to_End.layers import ExpGraphConv
 
 
 class FAE_ExpGraphConv(nn.Module):

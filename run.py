@@ -10,7 +10,7 @@ import numpy as np
 from options import get_options
 
 from utils.functions import load_data_class, load_model
-from eval import prediction_eval, imputation_eval
+from eval import supervised_prediction_eval, imputation_eval, embedding_prediction_eval
 from imputer import impute
 from sklearn.preprocessing import normalize
 
@@ -49,11 +49,15 @@ def run(opts):
         data.x = torch.eye(data.num_nodes)
 
     data = data.to(opts.device)
-    model_class = load_model(opts.model)
+    model_class = load_model(opts)
     assert opts.problem in ['Prediction', 'Imputation', 'Imputation_eval'], 'only support prediction or imputation of expression values'
 
     if opts.problem == 'Prediction':
-        prediction_eval(model_class, data, opts)
+        if not opts.embedding:
+            supervised_prediction_eval(model_class, data, opts)
+        else:
+            embedding_prediction_eval(model_class, data, opts)
+
     elif opts.problem == 'Imputation_eval':
         imputation_eval(model_class, data, opts)
     elif opts.problem == 'Imputation':

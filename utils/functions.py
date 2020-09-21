@@ -9,16 +9,23 @@ def load_data_class(name):
     assert dataset is not None, "Currently unsupported problem: {}!".format(name)
     return dataset
 
-def load_model(name):
-    from models.supervised.nets import FAE_GraphConv, FAE_GCN, FAE_SAGEConv, FAE_ExpGraphConv\
-        ,AE_MLP
-    model = {'GraphConv': FAE_GraphConv,
-          'GCN': FAE_GCN,
-          'SAGEConv': FAE_SAGEConv ,
-          'ExpGraphConv': FAE_ExpGraphConv,
-          'MLP': AE_MLP
-    }.get(name, None)
-    assert model is not None, "Currently unsupported model: {}!".format(name)
+def load_model(opts):
+    from models.End_to_End.nets import FAE_GraphConv, FAE_GCN, FAE_SAGEConv, FAE_ExpGraphConv\
+        , AE_MLP
+    from models.Embedding.model import Embedding_ExpGAE
+
+    if not opts.embedding:
+        model = {'GraphConv': FAE_GraphConv,
+              'GCN': FAE_GCN,
+              'SAGEConv': FAE_SAGEConv ,
+              'ExpGraphConv': FAE_ExpGraphConv,
+              'MLP': AE_MLP
+        }.get(opts.model, None)
+    else:
+        model = Embedding_ExpGAE
+
+
+    assert model is not None, "Currently unsupported model: {}!".format(opts.model)
     return model
 
 
