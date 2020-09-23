@@ -9,13 +9,13 @@ def get_options(args=None):
 
     # Data
     parser.add_argument('--problem', default='Imputation_eval', help="Want to predict or Impute the dataset")
-    parser.add_argument('--network', type=str, default='PPI')
+    parser.add_argument('--network', type=str, default='Genetic')
     parser.add_argument('--dataset', type=str, default='Ecoli')
-    parser.add_argument('--datadir', type=str, default='data/Ecoli')
+    parser.add_argument('--datadir', type=str, default='../data/Expression_Values/Ecoli')
 
     # Model
 
-    parser.add_argument('--model', type=str, default='ExpGraphConv')
+    parser.add_argument('--model', type=str, default='MLP')
     parser.add_argument('--embedding', action='store_true', help='Whether to make predictions on the graph embedding')
     parser.add_argument('--hidden', type=int, default=16)
     parser.add_argument('--out_channels', type=int, default=32)

@@ -16,8 +16,8 @@ class FAE_ExpGraphConv(nn.Module):
             self.conv2 = ExpGraphConv(64, 32, 32, aggr='mean')
             self.lin = Lin(32, 1)
         else:
-            self.conv1 = ExpGraphConv(in_channels, 64, 256, aggr='mean')
-            self.lin = Lin(256, in_channels)
+            self.conv1 = ExpGraphConv(in_channels, 64, 64, aggr='mean')
+            self.lin = Lin(64, in_channels)
     def forward(self, data):
         if self.opts.problem == 'Prediction':
             x, edge_index = data.x, data.edge_index
@@ -122,8 +122,8 @@ class AE_MLP(nn.Module):
             self.lin2 = Lin(64, 32)
             self.lin3 = Lin(32, 1)
         else:
-            self.lin1 = Lin(in_channels, 256)
-            self.lin2 = Lin(256, in_channels)
+            self.lin1 = Lin(in_channels, 64)
+            self.lin2 = Lin(64, in_channels)
 
     def forward(self, data):
         if self.opts.problem == 'Prediction':

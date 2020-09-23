@@ -46,7 +46,7 @@ def run(opts):
     # Preprocess node features
     if opts.no_features:
         print('node ids used')
-        data.x = torch.eye(data.num_nodes)
+        data.x = torch.eye(data.num_nodes).to(opts.device)
 
     data = data.to(opts.device)
     model_class = load_model(opts)
