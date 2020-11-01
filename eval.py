@@ -6,8 +6,10 @@ from train_test import train_epoch, test
 import copy
 from models.End_to_End.nets import AE_MLP
 from models.Embedding.model import Encoder
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
 from utils.functions import index_to_mask
-
+from magic import MAGIC
 
 def supervised_prediction_eval(model_class, data, opts):
 
@@ -30,24 +32,41 @@ def supervised_prediction_eval(model_class, data, opts):
         eval_data.train_mask = index_to_mask(train_index, eval_data.x.size(0))
         eval_data.test_mask = index_to_mask(test_index, eval_data.x.size(0))
         for exp_num in range(eval_data.y.size(1)):
-            torch.manual_seed(opts.seed)
-            if torch.cuda.is_available():
-                torch.cuda.manual_seed_all(opts.seed)
-            model = model_class(eval_data.num_features, opts).to(opts.device)
-            optimizer = torch.optim.Adam(model.parameters(), lr=opts.learning_rate)
-            for epoch in range(1, opts.epochs + 1):
-                loss_train = train_epoch(model, eval_data, optimizer, opts, exp_num, criterion)
-            loss_test = test(model, eval_data, exp_num, criterion, opts)
-            model.eval()
-            print('Exp: {:03d}, Loss: {:.5f}, TestLoss: {:.5f}'.
-                  format(exp_num, loss_train, loss_test))
-            with torch.no_grad():
-                y_pred.append(model(eval_data))
-#             del model
-#             del optimizer
+            if (model_class == LinearRegression) | (model_class == RandomForestRegressor):
+                model = model_class()
+                model.fit(eval_data.x[eval_data.train_mask], eval_data.y[eval_data.train_mask, exp_num])
+                pred = model.predict(eval_data.x[eval_data.test_mask])
+                test_loss = scimse(pred,
+                       eval_data.y[eval_data.test_mask, exp_num])
+                print('Exp: {:03d}, Loss: {:.5f}'
+                      .format(exp_num, test_loss))
+                y_pred.append(pred)
+            else:
+                torch.manual_seed(opts.seed)
+                if torch.cuda.is_available():
+                    torch.cuda.manual_seed_all(opts.seed)
+
+                model = model_class(eval_data.num_features, opts).to(opts.device)
+                optimizer = torch.optim.Adam(model.parameters(), lr=opts.learning_rate)
+                best_loss = 1e9
+                for epoch in range(1, opts.epochs + 1):
+                    loss_train = train_epoch(model, eval_data, optimizer, opts, exp_num, criterion)
+                    if loss_train < best_loss:
+                        best_loss = loss_train
+                        best_model = copy.deepcopy(model)
+                loss_test = test(best_model, eval_data, exp_num, criterion, opts)
+                print('Exp: {:03d}, Loss: {:.5f}, TestLoss: {:.5f}'.
+                      format(exp_num, loss_train, loss_test))
+                with torch.no_grad():
+                    y_pred.append(best_model(eval_data))
+
         for i in range(eval_data.y.size(1)):
-            mse.append(scimse(y_pred[i][eval_data.test_mask.cpu().numpy()].cpu().numpy(),
-                              eval_data.y[eval_data.test_mask, i].cpu().numpy().reshape([-1, 1])))
+            if (model_class == LinearRegression) | (model_class == RandomForestRegressor):
+                mse.append(scimse(y_pred[i],
+                                  eval_data.y[eval_data.test_mask, i]))
+            else:
+                mse.append(scimse(y_pred[i][eval_data.test_mask.cpu().numpy()].cpu().numpy(),
+                                  eval_data.y[eval_data.test_mask, i].cpu().numpy().reshape([-1, 1])))
     print('Average+-std Error for test expression values: {:.5f}+-{:.5f}'.format(np.mean(mse), np.std(mse)))
     return mse
 
@@ -92,8 +111,6 @@ def embedding_prediction_eval(model_class, data, opts):
                   format(exp_num, loss_test_lr, loss_test_rf))
             with torch.no_grad():
                 y_pred.append(model.predict(eval_data.x, eval_data.edge_index))
-        #             del model
-        #             del optimizer
         for i in range(eval_data.y.size(1)):
             mse_lr.append(scimse(y_pred[i][0][eval_data.test_mask.cpu().numpy()],
                               eval_data.y[eval_data.test_mask, i].cpu().numpy().reshape([-1, 1])))
@@ -106,9 +123,9 @@ def embedding_prediction_eval(model_class, data, opts):
 
 
 def imputation_eval(model_class, data, opts):
-    if model_class == AE_MLP:
+    if model_class == MAGIC:
         data.x = data.y = data.x.t()
-#         data.nonzeromask = data.nonzeromask.t()
+        # data.nonzeromask = data.nonzeromask.t()
     criterion = torch.nn.MSELoss()
     kf = KFold(n_splits=3, random_state=opts.seed, shuffle=True)
     loss_test = []
@@ -120,16 +137,23 @@ def imputation_eval(model_class, data, opts):
         print('Fold number: {:d}'.format(k))
         train_index, test_index = train_test_indices
         eval_data = copy.deepcopy(data)
-        eval_data.train_mask = index_to_mask([indices[0, train_index], indices[1, train_index]], eval_data.x.size()).to(opts.device)
-        eval_data.test_mask = index_to_mask([indices[0, test_index], indices[1, test_index]], eval_data.x.size()).to(opts.device)
-        model = model_class(eval_data.num_features, opts).to(opts.device)
-        optimizer = torch.optim.Adam(model.parameters(), lr=opts.learning_rate)
-        for epoch in range(1, opts.epochs + 1):
-            loss_train = train_epoch(model, eval_data, optimizer, opts, criterion=criterion)
-            if epoch % 10 == 0:
-                print('Epoch number: {:03d}, Train_loss: {:.5f}'.format(epoch, loss_train))
-        loss_test.append(test(model, eval_data, None, criterion, opts))
-        print('Loss: {:.5f}, TestLoss: {:.5f}'.
-              format(loss_train, loss_test[k]))
+        eval_data.train_mask = index_to_mask([indices[0, train_index], indices[1, train_index]],
+                                             eval_data.x.size()).to(opts.device)
+        eval_data.test_mask = index_to_mask([indices[0, test_index], indices[1, test_index]],
+                                            eval_data.x.size()).to(opts.device)
+        if model_class == MAGIC:
+            pred = model_class().fit_transform((eval_data.x*eval_data.train_mask).cpu().data.numpy())
+            loss_test.append(scimse(pred*eval_data.test_mask.cpu().data.numpy(),
+                                    (eval_data.y*eval_data.test_mask).cpu().data.numpy()))
+        else:
+            model = model_class(eval_data.num_features, opts).to(opts.device)
+            optimizer = torch.optim.Adam(model.parameters(), lr=opts.learning_rate)
+            for epoch in range(1, opts.epochs + 1):
+                loss_train = train_epoch(model, eval_data, optimizer, opts, criterion=criterion)
+                if epoch % 10 == 0:
+                    print('Epoch number: {:03d}, Train_loss: {:.5f}'.format(epoch, loss_train))
+            loss_test.append(test(model, eval_data, None, criterion, opts))
+            print('Loss: {:.5f}, TestLoss: {:.5f}'.
+                  format(loss_train, loss_test[k]))
     print('Average+-std Error for test RNA values: {:.5f}+-{:.5f}'.format(np.mean(loss_test), np.std(loss_test)))
     return np.mean(loss_test)

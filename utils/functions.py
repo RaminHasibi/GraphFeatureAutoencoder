@@ -13,13 +13,18 @@ def load_model(opts):
     from models.End_to_End.nets import FAE_GraphConv, FAE_GCN, FAE_SAGEConv, FAE_ExpGraphConv\
         , AE_MLP
     from models.Embedding.model import Embedding_ExpGAE
-
+    from magic import MAGIC
+    from sklearn.linear_model import LinearRegression
+    from sklearn.ensemble import RandomForestRegressor
     if not opts.embedding:
         model = {'GraphConv': FAE_GraphConv,
               'GCN': FAE_GCN,
               'SAGEConv': FAE_SAGEConv ,
               'ExpGraphConv': FAE_ExpGraphConv,
-              'MLP': AE_MLP
+              'MLP': AE_MLP,
+              'Magic': MAGIC,
+                 'LR': LinearRegression,
+                 'RF': RandomForestRegressor
         }.get(opts.model, None)
     else:
         model = Embedding_ExpGAE

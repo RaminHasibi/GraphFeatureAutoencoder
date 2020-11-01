@@ -1,6 +1,4 @@
 
-import os
-import json
 import pprint as pp
 
 
@@ -12,7 +10,6 @@ from options import get_options
 from utils.functions import load_data_class, load_model
 from eval import supervised_prediction_eval, imputation_eval, embedding_prediction_eval
 from imputer import impute
-from sklearn.preprocessing import normalize
 
 
 def run(opts):
@@ -22,11 +19,6 @@ def run(opts):
 
     # Set the random seed
     torch.manual_seed(opts.seed)
-    
-    os.makedirs(opts.save_dir)
-    # Save arguments so exact configuration can always be found
-    with open(os.path.join(opts.save_dir, "args.json"), 'w') as f:
-        json.dump(vars(opts), f, indent=True)
 
     # Set the device
     opts.device = torch.device("cuda:0" if opts.use_cuda else "cpu")
@@ -36,11 +28,6 @@ def run(opts):
 
     # Load data from load_path
     data = data_class(root=opts.datadir, network=opts.network)[0]
-    print(opts.norm)
-#     if not opts.no_features and opts.norm:
-#         print('data normalized')
-#         data.y = data.x = torch.tensor(normalize(data.x, norm='l1'), dtype=torch.float32)
-#         print(data)
         
     
     # Preprocess node features
