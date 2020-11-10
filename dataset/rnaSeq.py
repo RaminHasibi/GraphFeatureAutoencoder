@@ -11,12 +11,9 @@ class RnaSeq(InMemoryDataset):
     def __init__(self, root, network='MousePPI', transform=None, pre_transform=None):
         self.network = network
         super(InMemoryDataset, self).__init__(root, transform, pre_transform)
-        if self.network == 'HumanPPI':
+
+        if self.network == 'MousePPI':
             self.data, self.slices = torch.load(self.processed_paths[0])
-        elif self.network == 'SmallPPI':
-            self.data, self.slices = torch.load(self.processed_paths[1])
-        elif self.network == 'MousePPI':
-            self.data, self.slices = torch.load(self.processed_paths[2])
 
     @property
     def raw_file_names(self):
@@ -24,8 +21,7 @@ class RnaSeq(InMemoryDataset):
 
     @property
     def processed_file_names(self):
-        return ['HumanPPI_processed_rnaSeq_data.pt', 'SmallPPI_processed_rnaSeq_data.pt',
-                'MousePPI_processed_rnaSeq_data.pt']
+        return ['MousePPI_processed_rnaSeq_data.pt']
 
     def download(self):
         pass
@@ -53,9 +49,5 @@ class RnaSeq(InMemoryDataset):
 
         data = Data(x=x, edge_index=edge_index, y=x, nonzeromask=matrix_mask)
         data.gene_names = gene_names if gene_names is not None else None
-        if self.network == 'HumanPPI':
+        if self.network == 'MousePPI':
             torch.save(self.collate([data]), self.processed_paths[0])
-        elif self.network == 'SmallPPI':
-            torch.save(self.collate([data]), self.processed_paths[1])
-        elif self.network == 'MousePPI':
-            torch.save(self.collate([data]), self.processed_paths[2])

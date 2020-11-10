@@ -6,8 +6,6 @@ import networkx as nx
 from sklearn.model_selection import KFold
 from train_test import train_epoch, test
 import copy
-from models.End_to_End.nets import AE_MLP
-from models.Embedding.model import Encoder
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from utils.functions import index_to_mask
@@ -146,7 +144,7 @@ def imputation_eval(model_class, data, opts):
         eval_data = copy.deepcopy(data)
         eval_data.train_mask = index_to_mask([indices[0, train_index], indices[1, train_index]],
                                              eval_data.x.size()).to(opts.device)
-        eval_data.test_mask = index_to_mask([indices[0, test_index], indices[1, test_index]],j
+        eval_data.test_mask = index_to_mask([indices[0, test_index], indices[1, test_index]],
                                             eval_data.x.size()).to(opts.device)
         if model_class == MAGIC:
             pred = model_class().fit_transform((eval_data.x*eval_data.train_mask).cpu().data.numpy())
@@ -160,7 +158,6 @@ def imputation_eval(model_class, data, opts):
                 if epoch % 10 == 0:
                     print('Epoch number: {:03d}, Train_loss: {:.5f}'.format(epoch, loss_train))
             loss_test.append(test(model, eval_data, None, criterion, opts))
-            print('Loss: {:.5f}, TestLoss: {:.5f}'.
-                    format(loss_train, loss_test[k]))
+            print('Loss: {:.5f}, TestLoss: {:.5f}'.format(loss_train, loss_test[k]))
     print('Average+-std Error for test RNA values: {:.5f}+-{:.5f}'.format(np.mean(loss_test), np.std(loss_test)))
     return np.mean(loss_test)
