@@ -22,6 +22,8 @@ Download the required libraries using:
 pip install -r requirements.txt
 ```
 
-you can run the experiments using the run.py file.
+You can run the experiments using the run.py file.
+
+Different options for different experiments are available in the options.py.
 
 
