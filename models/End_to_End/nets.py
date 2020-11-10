@@ -7,7 +7,7 @@ from torch.nn import Linear as Lin
 from models.End_to_End.layers import ExpGraphConv
 
 
-class FAE_ExpGraphConv(nn.Module):
+class FAE_FeatGraphConv(nn.Module):
     def __init__(self, in_channels, opts):
         super(FAE_ExpGraphConv, self).__init__()
         self.opts = opts
@@ -90,11 +90,11 @@ class FAE_GraphConv(nn.Module):
         super(FAE_GraphConv, self).__init__()
         self.opts = opts
         if self.opts.problem == 'Prediction':
-            self.conv1 = GraphConv(in_channels, 64, aggr='mean')
+            self.conv1 = GraphConv(in_channels, 64)
             self.conv2 = GraphConv(64, 32, aggr='mean')
             self.lin = Lin(32, 1)
         else:
-            self.conv1 = GraphConv(in_channels, 64, aggr='mean')
+            self.conv1 = GraphConv(in_channels, 64)
             # self.conv2 = GraphConv(64, 32,aggr='mean')
             self.lin = Lin(64, in_channels)
 

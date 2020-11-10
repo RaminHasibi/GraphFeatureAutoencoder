@@ -1,6 +1,8 @@
 import torch
 from sklearn.metrics import mean_squared_error as scimse
+from torch_geometric.utils import to_undirected
 import numpy as np
+import networkx as nx
 from sklearn.model_selection import KFold
 from train_test import train_epoch, test
 import copy
@@ -25,6 +27,11 @@ def supervised_prediction_eval(model_class, data, opts):
         y_pred = []
         train_index, test_index = train_test_indices
         eval_data = copy.deepcopy(data)
+        if opts.random_graph:
+            print('Random Graph used')
+            G_rand = nx.gnp_random_graph(data.x.shape[0],opts.random_graph_alpha)
+            eval_data.edge_index = to_undirected(torch.tensor(np.array(G_rand.edges()).T).to(opts.device))
+            print(eval_data)
         train_feats_indeces, test_feats_indeces = next(kf_feats.split(np.arange(data.y.size(1))))
         if not opts.no_features:
             eval_data.x = data.x[:, train_feats_indeces]
@@ -125,7 +132,7 @@ def embedding_prediction_eval(model_class, data, opts):
 def imputation_eval(model_class, data, opts):
     if model_class == MAGIC:
         data.x = data.y = data.x.t()
-        # data.nonzeromask = data.nonzeromask.t()
+        data.nonzeromask = data.nonzeromask.t()
     criterion = torch.nn.MSELoss()
     kf = KFold(n_splits=3, random_state=opts.seed, shuffle=True)
     loss_test = []
@@ -139,7 +146,7 @@ def imputation_eval(model_class, data, opts):
         eval_data = copy.deepcopy(data)
         eval_data.train_mask = index_to_mask([indices[0, train_index], indices[1, train_index]],
                                              eval_data.x.size()).to(opts.device)
-        eval_data.test_mask = index_to_mask([indices[0, test_index], indices[1, test_index]],
+        eval_data.test_mask = index_to_mask([indices[0, test_index], indices[1, test_index]],j
                                             eval_data.x.size()).to(opts.device)
         if model_class == MAGIC:
             pred = model_class().fit_transform((eval_data.x*eval_data.train_mask).cpu().data.numpy())
@@ -154,6 +161,6 @@ def imputation_eval(model_class, data, opts):
                     print('Epoch number: {:03d}, Train_loss: {:.5f}'.format(epoch, loss_train))
             loss_test.append(test(model, eval_data, None, criterion, opts))
             print('Loss: {:.5f}, TestLoss: {:.5f}'.
-                  format(loss_train, loss_test[k]))
+                    format(loss_train, loss_test[k]))
     print('Average+-std Error for test RNA values: {:.5f}+-{:.5f}'.format(np.mean(loss_test), np.std(loss_test)))
     return np.mean(loss_test)

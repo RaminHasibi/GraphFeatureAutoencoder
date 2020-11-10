@@ -34,17 +34,17 @@ def run(opts):
     if opts.no_features:
         print('node ids used')
         data.x = torch.eye(data.num_nodes).to(opts.device)
-
+    
     data = data.to(opts.device)
     model_class = load_model(opts)
     assert opts.problem in ['Prediction', 'Imputation', 'Imputation_eval'], 'only support prediction or imputation of expression values'
-
+    print(data)
     if opts.problem == 'Prediction':
         if not opts.embedding:
             supervised_prediction_eval(model_class, data, opts)
         else:
             embedding_prediction_eval(model_class, data, opts)
-
+    
     elif opts.problem == 'Imputation_eval':
         imputation_eval(model_class, data, opts)
     elif opts.problem == 'Imputation':

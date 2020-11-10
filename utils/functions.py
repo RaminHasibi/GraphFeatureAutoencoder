@@ -10,7 +10,7 @@ def load_data_class(name):
     return dataset
 
 def load_model(opts):
-    from models.End_to_End.nets import FAE_GraphConv, FAE_GCN, FAE_SAGEConv, FAE_ExpGraphConv\
+    from models.End_to_End.nets import FAE_GraphConv, FAE_GCN, FAE_SAGEConv, FAE_FeatGraphConv\
         , AE_MLP
     from models.Embedding.model import Embedding_ExpGAE
     from magic import MAGIC
@@ -20,7 +20,7 @@ def load_model(opts):
         model = {'GraphConv': FAE_GraphConv,
               'GCN': FAE_GCN,
               'SAGEConv': FAE_SAGEConv ,
-              'ExpGraphConv': FAE_ExpGraphConv,
+              'FeatGraphConv': FAE_FeatGraphConv,
               'MLP': AE_MLP,
               'Magic': MAGIC,
                  'LR': LinearRegression,
@@ -35,7 +35,7 @@ def load_model(opts):
 
 
 def index_to_mask(index, size):
-    # if len(size) == 2
+    
     mask = torch.zeros(size, dtype=torch.bool)
     mask[index] = 1
     return mask
