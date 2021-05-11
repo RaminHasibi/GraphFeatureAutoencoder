@@ -16,7 +16,7 @@ class FAE_FeatGraphConv(nn.Module):
             self.conv2 = FeatGraphConv(64, 32, 32, aggr='mean')
             self.lin = Lin(32, 1)
         else:
-            self.conv1 = FeatGraphConv(in_channels, 16, 32, aggr='mean')
+            self.conv1 = FeatGraphConv(in_channels, 64, 32, aggr='mean')
             self.lin = Lin(32, in_channels)
     def forward(self, data):
         if self.opts.problem == 'Prediction':

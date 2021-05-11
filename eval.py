@@ -146,6 +146,7 @@ def imputation_eval(model_class, data, opts):
                                              eval_data.x.size()).to(opts.device)
         eval_data.test_mask = index_to_mask([indices[0, test_index], indices[1, test_index]],
                                             eval_data.x.size()).to(opts.device)
+        eval_data.x = eval_data.x * eval_data.train_mask
         if model_class == MAGIC:
             pred = model_class().fit_transform((eval_data.x*eval_data.train_mask).cpu().data.numpy())
             loss_test.append(scimse(pred*eval_data.test_mask.cpu().data.numpy(),
